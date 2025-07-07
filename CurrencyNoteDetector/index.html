@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Currency Note Detector</title>
+  <style>
+    /* Reset & background */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    }
+
+    /* Loader styles */
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Hide loader after load */
+    .hidden {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s ease;
+    }
+
+    /* Main app container */
+    .container {
+      display: none;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff;
+      padding: 40px 50px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      color: #2c3e50;
+    }
+
+    input[type="file"] {
+      margin: 20px 0;
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    button {
+      padding: 12px 25px;
+      background-color: #2980b9;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1f6390;
+    }
+
+    #result {
+      margin-top: 25px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #27ae60;
+      min-height: 24px;
+    }
+
+    .note-icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+      color: #3498db;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔄 Loader -->
+  <div id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- 💵 Main Content -->
+  <div class="container">
+    <div class="card">
+      <div class="note-icon">💵</div>
+      <h1>Currency Note Detector</h1>
+      <input type="file" id="noteImage" accept="image/*" />
+      <br />
+      <button onclick="uploadImage()">Detect Note</button>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    // 🔁 Hide loader after page load
+    window.onload = () => {
+      document.getElementById("loader").classList.add("hidden");
+      document.querySelector(".container").style.display = "flex";
+    };
+
+    // 🧠 Upload function
+    async function uploadImage() {
+      const input = document.getElementById("noteImage");
+      const file = input.files[0];
+
+      if (!file) {
+        alert("Please select an image of a currency note.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/detect", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        console.log("Server response:", data);
+        document.getElementById("result").innerText = "Detected: " + data.result;
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("result").innerText = "Error: Failed to detect.";
+      }
+    }
+  </script>
+</body>
+</html>
