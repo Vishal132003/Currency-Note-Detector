@@ -58,3 +58,4 @@ for value, (tmpl_img, kp_tmpl, des_tmpl) in templates.items():
         best_match = f"INR {value}"
 
 print(f"Detected: {best_match}")
+
